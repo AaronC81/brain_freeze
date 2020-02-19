@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+
+require 'parlour'
+
+# Grab given output file name
+OUTPUT_FILE = ARGV[0]
+unless OUTPUT_FILE
+  puts "Usage: brain_freeze <output-file> [filter ...]"
+  exit
+end
+
+# Warn if the output file already exists
+if File.exist?(OUTPUT_FILE)
+  puts "Warning: #{OUTPUT_FILE} already exists and will be included in the generated RBI."
+  puts "         This is VERY LIKELY to cause problems. Consider deleting it first!"
+end
+
+# Load objects
+objects = Parlour::TypeLoader.load_project('.')
+
+# Filter to only given objects, if any were given
+if ARGV.length > 1
+  _, objects_to_include = ARGV
+
+  # TODO: support namespacing
+  objects.children.delete_if do |child|
+    !objects_to_include.include?(child.name)
+  end
+end
+
+# Generate RBI using some default settings
+rbi = objects.generate_rbi(
+  0,
+  Parlour::RbiGenerator::Options.new(
+    break_params: 4,
+    tab_size: 2,
+    sort_namespaces: false,
+  )
+)
+
+File.write(OUTPUT_FILE, ["# typed: true", "", rbi].join("\n"))
