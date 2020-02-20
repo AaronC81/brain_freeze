@@ -19,7 +19,7 @@ It's likely this will include types you don't want, such as external RBIs. To
 filter to only the modules you'd like to include:
 
 ```
-brain_freeze foo.bar Foo Bar
+brain_freeze foo.rbi Foo Bar
 ```
 
 This will remove definitions for all namespaces except `Foo` and `Bar`. (Please
