@@ -1,39 +1,41 @@
-# BrainFreeze
+# Brain Freeze
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/brain_freeze`. To experiment with that code, run `bin/console` for an interactive prompt.
+Brain Freeze is a gem for generating a Sorbet RBI from inline types or other
+RBIs within a project.
 
-TODO: Delete this and the text above, and describe your gem
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'brain_freeze'
-```
-
-And then execute:
-
-    $ bundle install
-
-Or install it yourself as:
-
-    $ gem install brain_freeze
+It is an ultra-simple script based on [Parlour](https://github.com/AaronC81/parlour).
+It loads the project using Parlour's type parsing and loading, filters the 
+objects within it, and then generates a new RBI.
 
 ## Usage
 
-TODO: Write usage instructions here
+At the root of a Sorbet project, to generate an RBI file called `foo.rbi`:
 
-## Development
+```
+brain_freeze foo.rbi
+```
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+It's likely this will include types you don't want, such as external RBIs. To
+filter to only the modules you'd like to include:
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+```
+brain_freeze foo.bar Foo Bar
+```
+
+This will remove definitions for all namespaces except `Foo` and `Bar`. (Please
+note that this doesn't support nested namespaces yet, like `A::B`.)
+
+## Tips
+
+  - If you get any JSON parsing errors, you might not have Sorbet currently
+    installed in your Bundler environment - run `bundle install`.
+
+  - If you get errors about conflicting namespaces, delete any RBIs previously
+    generated with Brain Freeze for the same project.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/brain_freeze.
-
+Bug reports and pull requests are welcome on GitHub at https://github.com/AaronC81/brain_freeze.
 
 ## License
 
