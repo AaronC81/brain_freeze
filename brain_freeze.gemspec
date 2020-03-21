@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = "brain_freeze"
-  spec.version       = "1.1.0"
+  spec.version       = "1.1.1"
   spec.authors       = ["Aaron Christiansen"]
   spec.email         = ["aaronc20000@gmail.com"]
 
