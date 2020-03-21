@@ -11,7 +11,7 @@ end
 
 # Warn if the output file already exists
 if File.exist?(OUTPUT_FILE)
-  puts "Note: #{OUTPUT_FILE} exists and will be exluded from type loading."
+  puts "Note: #{OUTPUT_FILE} exists and will be excluded from type loading."
 end
 
 # Load objects
