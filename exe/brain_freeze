@@ -11,12 +11,11 @@ end
 
 # Warn if the output file already exists
 if File.exist?(OUTPUT_FILE)
-  puts "Warning: #{OUTPUT_FILE} already exists and will be included in the generated RBI."
-  puts "         This is VERY LIKELY to cause problems. Consider deleting it first!"
+  puts "Note: #{OUTPUT_FILE} exists and will be exluded from type loading."
 end
 
 # Load objects
-objects = Parlour::TypeLoader.load_project('.')
+objects = Parlour::TypeLoader.load_project('.', exclusions: [OUTPUT_FILE])
 
 # Filter to only given objects, if any were given
 if ARGV.length > 1
