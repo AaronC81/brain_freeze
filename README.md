@@ -12,14 +12,14 @@ objects within it, and then generates a new RBI.
 At the root of a Sorbet project, to generate an RBI file called `foo.rbi`:
 
 ```
-brain_freeze foo.rbi
+brain_freeze --output-file foo.rbi
 ```
 
 It's likely this will include types you don't want, such as external RBIs. To
 filter to only the modules you'd like to include:
 
 ```
-brain_freeze foo.rbi Foo Bar
+brain_freeze --output-file foo.rbi --include-module Foo --include-module Bar
 ```
 
 This will remove definitions for all namespaces except `Foo` and `Bar`. (Please
