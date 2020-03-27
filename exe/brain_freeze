@@ -17,14 +17,26 @@ end
 # Load objects
 objects = Parlour::TypeLoader.load_project('.', exclusions: [OUTPUT_FILE])
 
+def remove_unwanted_modules(object, objects_to_include, prefix = nil)
+  object.children.select! do |child|
+    module_name = "#{prefix}#{child.name}"
+
+    if child.respond_to?(:children)
+      remove_unwanted_modules(child, objects_to_include, "#{module_name}::")
+      has_included_children = !child.children.empty?
+    end
+
+    included = objects_to_include ? objects_to_include.any? { |m| module_name.start_with?(m) } : true
+
+    included || has_included_children
+  end
+end
+
 # Filter to only given objects, if any were given
 if ARGV.length > 1
   _, objects_to_include = ARGV
 
-  # TODO: support namespacing
-  objects.children.delete_if do |child|
-    !objects_to_include.include?(child.name)
-  end
+  remove_unwanted_modules(objects, objects_to_include, prefix = nil)
 end
 
 # Generate RBI using some default settings
