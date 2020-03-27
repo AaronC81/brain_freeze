@@ -6,3 +6,5 @@
 /pkg/
 /spec/reports/
 /tmp/
+*.gem
+/spec/projects/*/output.rbi

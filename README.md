@@ -33,6 +33,18 @@ note that this doesn't support nested namespaces yet, like `A::B`.)
   - If you get errors about conflicting namespaces, delete any RBIs previously
     generated with Brain Freeze for the same project.
 
+## Tests
+
+Brain Freeze contains a set of project tests, which are tests which simulate
+running it on a Sorbet project. These tests are in `spec/projects`. Each one
+requires:
+
+  - A Ruby source file which Brain Freeze will read.
+  - A `sorbet` directory containing a `config` file, whose content is simply the
+    name of the Ruby source file. This tells Sorbet which file to read when
+    typechecking, without requiring a full `srb init`ed project.
+  - An `expected.rbi` file with the expected output of Brain Freeze.
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/AaronC81/brain_freeze.
