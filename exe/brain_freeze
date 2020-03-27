@@ -1,42 +1,75 @@
 #!/usr/bin/env ruby
 
 require 'parlour'
+require 'optparse'
 
-# Grab given output file name
-OUTPUT_FILE = ARGV[0]
-unless OUTPUT_FILE
-  puts "Usage: brain_freeze <output-file> [filter ...]"
-  exit
+options = {
+  modules_to_include: [],
+  modules_to_exclude: [],
+  paths_to_exclude: [],
+  output_filename: nil,
+  root: '.',
+}
+
+OptionParser.new do |opts|
+  opts.banner = 'Usage: brain_freeze [options] [root]'
+
+  opts.separator ''
+  opts.separator 'Specific options:'
+
+  opts.on('--include-module MODULE', 'Module to include') do |mod|
+    options[:modules_to_include] << mod
+  end
+
+  opts.on('--exclude-module MODULE', 'Module to exclude') do |mod|
+    options[:modules_to_exclude] << mod
+  end
+
+  opts.on('--exclude-path PATH', 'Filepath to exclude') do |path|
+    options[:paths_to_exclude] << path
+  end
+
+  opts.on('--output-filename FILENAME', 'Write output to a file instead of STDOUT') do |filename|
+    options[:output_filename] = filename
+  end
+
+  opts.on('--help', 'Shows this prompt') do
+    puts opts
+    exit
+  end
+end.parse!
+
+options[:root] = ARGV.pop || options[:root]
+
+if options[:output_filename] && File.exist?(options[:output_filename])
+  puts "Note: #{options[:output_filename]} exists and will be excluded from type loading."
+  options[:paths_to_exclude] << options[:output_filename]
 end
 
-# Warn if the output file already exists
-if File.exist?(OUTPUT_FILE)
-  puts "Note: #{OUTPUT_FILE} exists and will be excluded from type loading."
-end
+puts "Running brain_freeze with options: #{options}"
 
 # Load objects
-objects = Parlour::TypeLoader.load_project('.', exclusions: [OUTPUT_FILE])
+objects = Parlour::TypeLoader.load_project(options[:root], exclusions: options[:paths_to_exclude] || [])
 
-def remove_unwanted_modules(object, objects_to_include, prefix = nil)
+def remove_unwanted_modules(object, options, prefix = nil)
   object.children.select! do |child|
     module_name = "#{prefix}#{child.name}"
 
     if child.respond_to?(:children)
-      remove_unwanted_modules(child, objects_to_include, "#{module_name}::")
+      remove_unwanted_modules(child, options, "#{module_name}::")
       has_included_children = !child.children.empty?
     end
 
-    included = objects_to_include ? objects_to_include.any? { |m| module_name.start_with?(m) } : true
+    included = options[:modules_to_include].empty? ? true : options[:modules_to_include].any? { |m| module_name.start_with?(m) }
+    excluded = options[:modules_to_exclude].empty? ? false : options[:modules_to_exclude].any? { |m| module_name.start_with?(m) }
 
-    included || has_included_children
+    (included || has_included_children) && !excluded
   end
 end
 
 # Filter to only given objects, if any were given
-if ARGV.length > 1
-  _, objects_to_include = ARGV
-
-  remove_unwanted_modules(objects, objects_to_include, prefix = nil)
+if !options[:modules_to_include].empty? || !options[:modules_to_exclude].empty?
+  remove_unwanted_modules(objects, options)
 end
 
 # Generate RBI using some default settings
@@ -49,4 +82,10 @@ rbi = objects.generate_rbi(
   )
 )
 
-File.write(OUTPUT_FILE, ["# typed: true", "", rbi].join("\n"))
+rbi = ["# typed: true", "", rbi].join("\n")
+
+if options[:output_filename]
+  File.write(options[:output_filename], rbi)
+else
+  puts rbi
+end
