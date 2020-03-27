@@ -5,7 +5,7 @@ RSpec.describe 'projects' do
       Dir.chdir(project) do
         # Run Brain Freeze, showing output based on env
         out_hash = ENV['BRAIN_FREEZE_TEST_OUTPUT'] ? {} : { [:out, :err] => File::NULL }
-        system("brain_freeze output.rbi", out_hash)
+        system("brain_freeze output.rbi", out_hash) or raise "non-zero status from brain_freeze"
 
         # Compare strings
         actual_output = File.read("#{project}/output.rbi")
