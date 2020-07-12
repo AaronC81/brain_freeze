@@ -1,3 +1,9 @@
+# NOTE
+
+**[Parlour](https://github.com/AaronC81/parlour)'s command-line interface now supports the features of Brain Freeze (and more), so it is unlikely that Brain Freeze will be updated.** Please use Parlour instead!
+
+------
+
 # Brain Freeze
 
 Brain Freeze is a gem for generating a Sorbet RBI from inline types or other
